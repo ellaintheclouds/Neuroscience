@@ -9,53 +9,52 @@ split <- split(phototaxis_data, phototaxis_data$genotype)
 
 phototaxis_data_c <- split$C
 phototaxis_data_c <- phototaxis_data_c[, 2:7]
-mean_c <- apply(phototaxis_data_c, 2, mean) # control mean
-sd_c <- apply(phototaxis_data_c, 2, sd) # control sd
+mean_c <- mean(phototaxis_data_c$phototaxis_score)
+sd_c <- sd(phototaxis_data_c$phototaxis_score)
 se_c <- (sd_c)/sqrt(38) # se
 
 
 phototaxis_data_m1 <- split$M1
 phototaxis_data_m1 <- phototaxis_data_m1[, 2:7]
-mean_m1 <- apply(phototaxis_data_m1, 2, mean) #  mean
-sd_m1 <- apply(phototaxis_data_m1, 2, sd) #  sd
+mean_m1 <- mean(phototaxis_data_m1$phototaxis_score)
+sd_m1 <- sd(phototaxis_data_m1$phototaxis_score)
 se_m1 <- (sd_m1)/sqrt(39) # se
 
 phototaxis_data_m2 <- split$M2
 phototaxis_data_m2 <- phototaxis_data_m2[, 2:7]
-mean_m2 <- apply(phototaxis_data_m2, 2, mean) #  mean
-sd_m2 <- apply(phototaxis_data_m2, 2, sd) #  sd
+mean_m2 <- mean(phototaxis_data_m2$phototaxis_score)
+sd_m2 <- sd(phototaxis_data_m2$phototaxis_score)
 se_m2 <- (sd_m2)/sqrt(39) # se
 
-plot_df <- data.frame("time" = c(1, 2, 3, 4, 5), 
-                      "mean_c" = mean_c[1:5],
-                      "se_c" = se_c[1.5], 
-                      "mean_m1" = mean_m1[1:5], 
-                      "se_m1" = se_m1[1:5], 
-                      "mean_m2" = mean_m2[1:5], 
-                      "se_m2" = se_m2[1:5])
+# Plot--------------------------------------------------------------------------
+plot_df <- data.frame("genotype" = c("Control", "Mutant 1", "Mutant 2"),
+                      "mean" = c(mean_c, mean_m1, mean_m2), 
+                      "se" = c(se_c, se_m1, se_m2))
 
 phototaxis_plot <- 
-  ggplot(plot_df, aes(x = time)) + 
-  geom_point(aes(y = mean_c), colour = "green4") +
-  geom_point(aes(y = mean_m1), colour = "cornflowerblue") +
-  geom_point(aes(y = mean_m2), colour = "red4") + 
-  
-  geom_errorbar(aes(ymin = mean_c - se_c, ymax = mean_c + se_c, width = 0.1),
-                colour = "green4") + 
-  geom_errorbar(aes(ymin = mean_m1 - se_m1, ymax = mean_m1 + se_m1, width = 0.1),
-                colour = "cornflowerblue") + 
-  geom_errorbar(aes(ymin = mean_m2 - se_m2, ymax = mean_m2 + se_m2, width = 0.1),
-                colour = "red4") + 
-  
-  geom_smooth(aes(x = time, y = mean_c), method = 'lm', 
-              colour = "green4", se = FALSE) + 
-  geom_smooth(aes(x = time, y = mean_m1), method = 'lm', 
-              colour = "cornflowerblue", se = FALSE) + 
-  geom_smooth(aes(x = time, y = mean_m2), method = 'lm', 
-              colour = "red4", se = FALSE) + 
-  
+  ggplot(plot_df, aes(x = genotype, y = mean)) + 
+  geom_bar(stat = "identity", width = 0.5, fill = "cornflowerblue") +
+  geom_errorbar(aes(ymin = mean - se, ymax = mean + se, width = 0.1)) + 
+  scale_y_continuous(expand = expansion(mult = c(0, 0.05))) + 
   theme_bw() + 
-  xlab("Time (Minutes)") + ylab("Mean Number of Flies in Light")
+  xlab("Genotype") + ylab("Mean Phototaxis Score")
 
-#ggsave(plot = phototaxis_plot, filename = "Graphs/phototaxis plot.png", 
- #      width = 6.25, height = 5)
+ggsave(plot = phototaxis_plot, filename = "Graphs/phototaxis plot.png", 
+       width = 6.25, height = 5)
+
+# Significance------------------------------------------------------------------
+# Normality test 
+shapiro.test(phototaxis_data_c$phototaxis_score) # 0.008909 not normal
+shapiro.test(phototaxis_data_m1$phototaxis_score) # 0.1755 normal
+shapiro.test(phototaxis_data_m2$phototaxis_score) # 0.02243 not normal
+
+# Significance Test
+wilcox_c_m1 <- wilcox.test(phototaxis_data_c$phototaxis_score, 
+                           phototaxis_data_m1$phototaxis_score, 
+                           alternative = "two.sided")
+wilcox_c_m1$p.value # 0.8135318 not significant
+
+wilcox_c_m2 <- wilcox.test(phototaxis_data_c$phototaxis_score, 
+                           phototaxis_data_m2$phototaxis_score, 
+                           alternative = "two.sided")
+wilcox_c_m2$p.value # 0.766309 not significant
