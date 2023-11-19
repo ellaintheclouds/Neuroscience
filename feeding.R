@@ -131,12 +131,12 @@ ggsave(plot = feeding_plot, filename = "Graphs/feeding plot.png",
 
 
 # Determining which genotypes eat more low quality than high quality food-------
-shapiro.test(c_low$conc_calculated) # 0.2653 normal
-shapiro.test(c_high$conc_calculated) # 0.02095 not normal
-shapiro.test(m1_low$conc_calculated) # 0.004216 not normal
-shapiro.test(m1_high$conc_calculated) # 0.003871 not normal
-shapiro.test(m2_low$conc_calculated) # 0.7369 normal
-shapiro.test(m2_high$conc_calculated) # 0.1476 normal
+shapiro.test(c_low$conc_calculated) # 0.2368 normal
+shapiro.test(c_high$conc_calculated) # 0.03295 not normal
+shapiro.test(m1_low$conc_calculated) # 0.003007 not normal
+shapiro.test(m1_high$conc_calculated) # 0.009512 not normal
+shapiro.test(m2_low$conc_calculated) # 0.686 normal
+shapiro.test(m2_high$conc_calculated) # 0.2163 normal
 
 wilcox_c <- wilcox.test(c_low$conc_calculated, c_high$conc_calculated, 
                         alternative = "greater", paired = TRUE)
