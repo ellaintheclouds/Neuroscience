@@ -1,9 +1,9 @@
 library(ggplot2)
 library(tidyverse)
 
-
 # Standard curve----------------------------------------------------------------
 standard_data <- read.csv("Data/feedingstandard.csv")
+standard_data$absorbance <- standard_data$absorbance - 0.032
 
 # Creating a model
 model4pl <- function(concentrationμg , Background, Mid, Slope, Bmax) {
@@ -126,8 +126,8 @@ feeding_plot <-
   labs(fill = "Food Quality") +
   theme_bw()
 
-#ggsave(plot = feeding_plot, filename = "Graphs/feeding plot.png", 
- #      width = 6.25, height = 5)
+ggsave(plot = feeding_plot, filename = "Graphs/feeding plot.png", 
+       width = 6.25, height = 5)
 
 
 # Determining which genotypes eat more low quality than high quality food-------
