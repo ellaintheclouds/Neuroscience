@@ -1,6 +1,10 @@
+# Set up------------------------------------------------------------------------
 library(ggplot2)
 
 olfaction_data <- read.csv("Data/olfaction.csv")
+
+
+# Data processing---------------------------------------------------------------
 olfaction_data <- olfaction_data[1:105,1:2]
 
 split_olf <- split(olfaction_data, olfaction_data$Genotype)
@@ -29,6 +33,7 @@ olf_plot_df <- data.frame(
   "se" = c(olf_se_c, olf_se_m1, olf_se_m2)
 )
 
+
 # Plot--------------------------------------------------------------------------
 olfaction_plot <- 
   ggplot(olf_plot_df, aes(x = Genotype, y = Avoidance.Score)) + 
@@ -41,22 +46,18 @@ olfaction_plot <-
 #ggsave(plot = olfaction_plot, filename = "Graphs/olfaction plot.png", 
  #      width = 6.25, height = 5)
 
+
 # Significance test-------------------------------------------------------------
-shapiro.test(olfaction_data_c) # 0.01979 not normal
-shapiro.test(olfaction_data_m1) # 0.1084 normal
-shapiro.test(olfaction_data_m2) # 0.2858 normal
-
-# F test to see variances
 var.test(olfaction_data_c, olfaction_data_m1, alternative = "two.sided") 
-#   0.1848668 not significant difference in variance
-var.test(olfaction_data_c, olfaction_data_m2, alternative = "two.sided") 
-#   0.873463 not significant difference in variance
+# 3.546e-06 variances not equal
 
-# Non-paired t-test
-t.test(olfaction_data_c, olfaction_data_m1, alternative = "two.sided",
-       mu = 0, paired = FALSE, var.equal = TRUE, conf.level = 0.95)
+var.test(olfaction_data_c, olfaction_data_m2, alternative = "two.sided") 
+# 0.6955 variances equal
+
+t.test(olfaction_data_c, olfaction_data_m1, alternative = "two.sided", mu = 0, 
+       paired = FALSE, var.equal = FALSE, conf.level = 0.95)
 # 2.2e-16 significant
 
-t.test(olfaction_data_c, olfaction_data_m2, alternative = "two.sided",
-       mu = 0, paired = FALSE, var.equal = TRUE, conf.level = 0.95)
+t.test(olfaction_data_c, olfaction_data_m2, alternative = "two.sided", mu = 0, 
+       paired = FALSE, var.equal = TRUE, conf.level = 0.95)
 # 0.332 not significant

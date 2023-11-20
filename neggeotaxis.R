@@ -1,6 +1,10 @@
+# Set up------------------------------------------------------------------------
 library(ggplot2)
 
 geotaxis_data <- read.csv("Data/neggeotaxis.csv")
+
+
+# Data processing---------------------------------------------------------------
 geotaxis_data <- geotaxis_data[1:110, 1:2]
 
 split_genotype <- split(geotaxis_data, geotaxis_data$Genotype)
@@ -25,6 +29,7 @@ plot_df <- data.frame("genotype" = c("c", "m1", "m2"),
                       "mean" = c(c_mean, m1_mean, m2_mean),
                       "se" = c(c_se, m1_se, m2_se))
 
+
 # Plot--------------------------------------------------------------------------
 geotaxis_plot <- 
   ggplot(data = plot_df, aes(x = genotype, y = mean)) + 
@@ -38,20 +43,22 @@ geotaxis_plot <-
 #ggsave(plot = geotaxis_plot, filename = "Graphs/negative geotaxis plot.png", 
  #      width = 6.25, height = 5)
 
+
 # Significance testing----------------------------------------------------------
-# Shapiro-Wilk's test
-shapiro.test(c_data$Performance.Index) # 4.034e-05 not normal
-shapiro.test(m1_data$Performance.Index) # 0.000167 not normal
-shapiro.test(m2_data$Performance.Index) # 1.68e-05 not normal
+var.test(c_data$Performance.Index, m1_data$Performance.Index, 
+         alternative = "two.sided") 
+# 0.1569 equal variance
 
-# Non-parametric non-paired Wilcoxon test
-wilcox_c_m1 <- wilcox.test(c_data$Performance.Index, 
-                           m1_data$Performance.Index, 
-                           alternative = "two.sided")
-wilcox_c_m1$p.value # 0.5607164
+var.test(c_data$Performance.Index, m2_data$Performance.Index, 
+         alternative = "two.sided") 
+# 0.8975 equal variance
 
-wilcox_c_m2 <- wilcox.test(c_data$Performance.Index, 
-                           m2_data$Performance.Index, 
-                           alternative = "two.sided")
-wilcox_c_m2$p.value # 0.7095901
+t.test(c_data$Performance.Index, m1_data$Performance.Index,
+       alternative = "two.sided", mu = 0, paired = FALSE, var.equal = TRUE, 
+       conf.level = 0.95)
+# 0.7789 not significant
 
+t.test(c_data$Performance.Index, m2_data$Performance.Index,
+       alternative = "two.sided", mu = 0, paired = FALSE, var.equal = TRUE, 
+       conf.level = 0.95)
+# 0.9444 not significant

@@ -1,6 +1,10 @@
+# Set up------------------------------------------------------------------------
 library(ggplot2)
 
 data <- read.csv("Data/courtship.csv")
+
+
+# Data processing---------------------------------------------------------------
 data <- data[,1:6]
 
 split_data <- split(data, data$Genotype)
@@ -43,6 +47,8 @@ plot_df <- data.frame("genotype" = c("c", "m1", "m2"),
                       "se_l" = c(c_l_se, m1_l_se, m2_l_se),
                       "mean_ci" = c(c_ci_mean, m1_ci_mean, m2_ci_mean),
                       "se_ci" = c(c_ci_se, m1_ci_se, m2_ci_se))
+
+
 # Plot--------------------------------------------------------------------------
 latency_plot <- 
   ggplot(plot_df, aes(x = genotype, y = mean_l)) +
@@ -68,37 +74,34 @@ index_plot <-
 #ggsave(plot = index_plot, filename = "Graphs/courtship index plot.png", 
  #      width = 6.25, height = 5)
 
+
 # Significance------------------------------------------------------------------
-# Test if normally distributed
-# I have chosen to use the Shapiro-Wilk's test (recommended for small samples)
-# A p-value >0.05 implies normal data
-shapiro.test(c_data$Courtship.initiation.latency..seconds.) # normal
-shapiro.test(m1_data$Courtship.initiation.latency..seconds.) # not normal
-shapiro.test(m2_data$Courtship.initiation.latency..seconds.) # not normal
-
-shapiro.test(c_data$Courtship.Index..CI.) # not normal
-shapiro.test(m1_data$Courtship.Index..CI.) # normal
-shapiro.test(m2_data$Courtship.Index..CI.) # not normal
-
-# Since the majority are not normal, let's do non-parametric analysis
-# Paired Wilcoxon test
+# Latency
 wilcox_c_m1 <- wilcox.test(c_data$Courtship.initiation.latency..seconds., 
             m1_data$Courtship.initiation.latency..seconds., 
             alternative = "two.sided")
-wilcox_c_m1$p.value # 0.001356899 significant diff
+wilcox_c_m1$p.value # 0.001356899 significant
 
 wilcox_c_m2 <- wilcox.test(c_data$Courtship.initiation.latency..seconds., 
                            m2_data$Courtship.initiation.latency..seconds., 
                            alternative = "two.sided")
-wilcox_c_m2$p.value # 0.06303843
+wilcox_c_m2$p.value # 0.06303843 not significant
 
+# Index
+var.test(c_data$Courtship.Index..CI., m1_data$Courtship.Index..CI., 
+         alternative = "two.sided") 
+# 0.2949732 equal variance
 
-ci_wilcox_c_m1 <- wilcox.test(c_data$Courtship.Index..CI., 
-                           m1_data$Courtship.Index..CI., 
-                           alternative = "two.sided")
-ci_wilcox_c_m1$p.value # 4.775778e-05 significant diff
+var.test(c_data$Courtship.Index..CI., m2_data$Courtship.Index..CI., 
+         alternative = "two.sided") 
+# 0.2797157 equal variance
 
-ci_wilcox_c_m2 <- wilcox.test(c_data$Courtship.Index..CI., 
-                              m2_data$Courtship.Index..CI., 
-                              alternative = "two.sided")
-ci_wilcox_c_m2$p.value #  0.001076902 significant diff
+t.test(c_data$Courtship.Index..CI., m1_data$Courtship.Index..CI.,
+       alternative = "two.sided", mu = 0, paired = FALSE, var.equal = TRUE, 
+       conf.level = 0.95)
+# 7.545e-06 significant
+
+t.test(c_data$Courtship.Index..CI., m2_data$Courtship.Index..CI.,
+       alternative = "two.sided", mu = 0, paired = FALSE, var.equal = TRUE, 
+       conf.level = 0.95)
+# 0.0004399 significant

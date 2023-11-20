@@ -1,5 +1,7 @@
+# Set up------------------------------------------------------------------------
 library(ggplot2)
 library(tidyverse)
+
 
 # Standard curve----------------------------------------------------------------
 standard_data <- read.csv("Data/feedingstandard.csv")
@@ -130,23 +132,24 @@ ggsave(plot = feeding_plot, filename = "Graphs/feeding plot.png",
        width = 6.25, height = 5)
 
 
-# Determining which genotypes eat more low quality than high quality food-------
-shapiro.test(c_low$conc_calculated) # 0.2368 normal
-shapiro.test(c_high$conc_calculated) # 0.03295 not normal
-shapiro.test(m1_low$conc_calculated) # 0.003007 not normal
-shapiro.test(m1_high$conc_calculated) # 0.009512 not normal
-shapiro.test(m2_low$conc_calculated) # 0.686 normal
-shapiro.test(m2_high$conc_calculated) # 0.2163 normal
+# Significance------------------------------------------------------------------
+var.test(c_low$conc_calculated, c_high$conc_calculated, alternative = "greater") 
+# 0.03287 unequal variance
 
-wilcox_c <- wilcox.test(c_low$conc_calculated, c_high$conc_calculated, 
-                        alternative = "greater", paired = TRUE)
-wilcox_c$p.value # 0.0003814697 significant
+var.test(m1_low$conc_calculated, m1_high$conc_calculated, alternative = "greater") 
+# 6.175e-07 unequal variance
 
-wilcox_m1 <- wilcox.test(m1_low$conc_calculated, m1_high$conc_calculated, 
-                        alternative = "greater", paired = TRUE)
-wilcox_m1$p.value # 0.00050354 significant
+var.test(m2_low$conc_calculated, m2_high$conc_calculated, alternative = "greater") 
+# 0.05441 equal variance
 
-wilcox_m2 <- wilcox.test(m2_low$conc_calculated, m2_high$conc_calculated[1:16], 
-                         alternative = "greater", paired = TRUE)
-wilcox_m2$p.value # 0.000213623 significant
+t.test(c_low$conc_calculated, c_high$conc_calculated, alternative = "greater", 
+       mu = 0, paired = FALSE, var.equal = FALSE, conf.level = 0.95)
+# 4.409e-05 significant
 
+t.test(m1_low$conc_calculated, m1_high$conc_calculated, alternative = "greater", 
+       mu = 0, paired = FALSE, var.equal = FALSE, conf.level = 0.95)
+# 0.00154 significant
+
+t.test(m2_low$conc_calculated, m2_high$conc_calculated, alternative = "greater", 
+       mu = 0, paired = FALSE, var.equal = TRUE, conf.level = 0.95)
+# 7.471e-06 significant

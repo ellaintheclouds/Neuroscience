@@ -1,6 +1,10 @@
+# Set up------------------------------------------------------------------------
 library(ggplot2)
 
 food_data <- read.csv("Data/foodtrap.csv")
+
+
+# Data processing---------------------------------------------------------------
 food_data <- food_data[,1:3]
 
 split_food <- split(food_data, food_data$Genotype)
@@ -82,12 +86,8 @@ foodtrap_plot <-
 #ggsave(plot = foodtrap_plot, filename = "Graphs/food trap plot.png", 
  #      width = 6.25, height = 5)
 
-# Significance analysis---------------------------------------------------------
-# Normality test
-shapiro.test(food_df$controlf) # 0.814 normal
-shapiro.test(food_df$mutant1f ) # 0.000131 not normal
-shapiro.test(food_df$mutant2f) # 0.4211 normal
 
+# Significance analysis---------------------------------------------------------
 # Variance test
 var.test(food_df$controlf, food_df$mutant1f, alternative = "two.sided") 
  # 0.2203 equal variance
@@ -98,8 +98,8 @@ var.test(food_df$controlf, food_df$mutant2f, alternative = "two.sided")
 # T-test
 t.test(food_df$controlf, food_df$mutant1f, alternative = "two.sided",
        mu = 0, paired = FALSE, var.equal = TRUE, conf.level = 0.95)
-# 0.000142 significant difference
+# 0.000142 significant 
 
 t.test(food_df$controlf, food_df$mutant2f, alternative = "two.sided",
        mu = 0, paired = FALSE, var.equal = TRUE, conf.level = 0.95)
-# 0.3319 non-significant difference
+# 0.3319 not significant 
