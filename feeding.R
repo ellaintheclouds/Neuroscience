@@ -30,7 +30,7 @@ standard_curve <- ggplot(standard_data, aes(x = concentrationμg, y = absorbance
                             Slope = coef(fit)["Slope"],
                             Bmax = coef(fit)["Bmax"])) +
   scale_y_continuous(expand = expansion(mult = c(0, 0.05))) + 
-  xlab("Log(Food Concentration (μgml-1))") + ylab("Absorbance Units (450 nm)") +
+  xlab("Log(Food Concentration (μgml-1))") + ylab("Absorbance Units (625 nm)") +
   theme_bw()
 
 #ggsave("Graphs/feeding standard curve modelled.png", plot = standard_curve, 
